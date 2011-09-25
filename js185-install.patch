@@ -1,0 +1,13 @@
+--- js-1.8.5/js/src/Makefile.in.orig	2011-09-23 19:51:09.376163452 +0200
++++ js-1.8.5/js/src/Makefile.in	2011-09-23 22:09:37.049774956 +0200
+@@ -888,8 +888,8 @@
+ ifeq (,$(HOST_BIN_SUFFIX))
+ 	mv -f $(SHLIB_ANY_VER) $(SHLIB_EXACT_VER)
+ 	@[ ! -h $(SHLIB_ABI_VER) ] || rm -f $(SHLIB_ABI_VER)
+-	ln -s $(SHLIB_EXACT_VER) $(SHLIB_ABI_VER)
+-	ln -s $(SHLIB_ABI_VER) $(SHLIB_ANY_VER)
++	ln -s $(SHARED_LIBRARY:$(DLL_SUFFIX)=.$(SRCREL_VERSION)$(DLL_SUFFIX)) $(SHLIB_ABI_VER)
++	ln -s $(SHARED_LIBRARY:$(DLL_SUFFIX)=.$(SRCREL_VERSION)$(DLL_SUFFIX)) $(SHLIB_ANY_VER)
+ endif
+ endif
+ ifneq (,$(IMPORT_LIBRARY))
