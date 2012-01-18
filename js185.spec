@@ -98,6 +98,12 @@ rm -rf $RPM_BUILD_ROOT
 # not installed by make install in new buildsystem
 install js/src/shell/js js/src/jscpucfg $RPM_BUILD_ROOT%{_bindir}
 
+# provide libjs.so for backward compability
+ln -sf libmozjs185.so $RPM_BUILD_ROOT%{_libdir}/libjs.so
+ln -sf libmozjs185.so.1.0.0 $RPM_BUILD_ROOT%{_libdir}/libjs.so.1.0.0
+ln -sf libmozjs185.so.1.0 $RPM_BUILD_ROOT%{_libdir}/libjs.so.1
+ln -sf libmozjs185-1.0.a $RPM_BUILD_ROOT%{_libdir}/libjs.a
+
 %clean
 rm -rf $RPM_BUILD_ROOT
 
@@ -108,6 +114,8 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc js/src/README.html
 %attr(755,root,root) %{_bindir}/js
+%attr(755,root,root) %{_libdir}/libjs.so.*.*.*
+%attr(755,root,root) %ghost %{_libdir}/libjs.so.1
 %attr(755,root,root) %{_libdir}/libmozjs185.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libmozjs185.so.1.0
 
@@ -115,10 +123,12 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %attr(755,root,root) %{_bindir}/js-config
 %attr(755,root,root) %{_bindir}/jscpucfg
+%attr(755,root,root) %{_libdir}/libjs.so
 %attr(755,root,root) %{_libdir}/libmozjs185.so
 %{_includedir}/js
 %{_pkgconfigdir}/mozjs185.pc
 
 %files static
 %defattr(644,root,root,755)
+%{_libdir}/libjs.a
 %{_libdir}/libmozjs185-1.0.a
