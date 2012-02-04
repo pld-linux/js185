@@ -23,6 +23,8 @@ BuildRequires:	rpm-perlprov
 BuildRequires:	rpmbuild(macros) >= 1.294
 BuildRequires:	sed >= 4.0
 Requires:	nspr >= 4.7.0
+Provides:	js = 2:1.8.5
+Obsoletes:	js < 2:1.8
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
