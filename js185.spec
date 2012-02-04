@@ -7,7 +7,7 @@ Summary:	SpiderMonkey JavaScript 1.8.5 implementation
 Summary(pl.UTF-8):	Implementacja SpiderMonkey języka JavaScript 1.8.5
 Name:		js185
 Version:	1.0.0
-Release:	2
+Release:	3
 License:	MPL 1.1 or GPL v2+ or LGPL v2.1+
 Group:		Libraries
 Source0:	http://ftp.mozilla.org/pub/mozilla.org/js/%{name}-%{version}.tar.gz
@@ -23,13 +23,6 @@ BuildRequires:	rpm-perlprov
 BuildRequires:	rpmbuild(macros) >= 1.294
 BuildRequires:	sed >= 4.0
 Requires:	nspr >= 4.7.0
-%ifarch %{x8664} ia64 ppc64 s390x sparc64
-Provides:	libjs.so.1()(64bit)
-%else
-Provides:	libjs.so.1
-%endif
-Provides:	js = 2:1.8.5
-Obsoletes:	js < 2:1.8
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -103,10 +96,9 @@ rm -rf $RPM_BUILD_ROOT
 # not installed by make install in new buildsystem
 install js/src/shell/js js/src/jscpucfg $RPM_BUILD_ROOT%{_bindir}
 
-# provide libjs.so for backward compability
+# provide libjs.so for backward compability at build time
+# (don't provide libjs.so.1 as the libraries are not binary-compatible)
 ln -sf libmozjs185.so $RPM_BUILD_ROOT%{_libdir}/libjs.so
-ln -sf libmozjs185.so.1.0.0 $RPM_BUILD_ROOT%{_libdir}/libjs.so.1.0.0
-ln -sf libmozjs185.so.1.0.0 $RPM_BUILD_ROOT%{_libdir}/libjs.so.1
 ln -sf libmozjs185-1.0.a $RPM_BUILD_ROOT%{_libdir}/libjs.a
 
 %clean
@@ -119,9 +111,6 @@ rm -rf $RPM_BUILD_ROOT
 %defattr(644,root,root,755)
 %doc js/src/README.html
 %attr(755,root,root) %{_bindir}/js
-%attr(755,root,root) %{_libdir}/libjs.so.*.*.*
-# NOTE: it's alternative symlink, created in PLD, so must be packaged
-%attr(755,root,root) %{_libdir}/libjs.so.1
 %attr(755,root,root) %{_libdir}/libmozjs185.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libmozjs185.so.1.0
 
