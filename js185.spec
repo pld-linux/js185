@@ -3,13 +3,17 @@
 # but some still do (includes path, js-config, js shell).
 # It's somehow messy, so let's put this version in separate js185 package for now,
 # until upstream decides which way to go in the future.
+#
+# Conditional build:
+%bcond_with	default_js	# build as default js package
+
 Summary:	SpiderMonkey JavaScript 1.8.5 implementation
 Summary(pl.UTF-8):	Implementacja SpiderMonkey języka JavaScript 1.8.5
 Name:		js185
 Version:	1.0.0
-Release:	3
+Release:	4
 License:	MPL 1.1 or GPL v2+ or LGPL v2.1+
-Group:		Libraries
+Group:		Development/Languages
 Source0:	http://ftp.mozilla.org/pub/mozilla.org/js/%{name}-%{version}.tar.gz
 # Source0-md5:	a4574365938222adca0a6bd33329cb32
 Patch0:		%{name}-install.patch
@@ -22,9 +26,11 @@ BuildRequires:	readline-devel
 BuildRequires:	rpm-perlprov
 BuildRequires:	rpmbuild(macros) >= 1.294
 BuildRequires:	sed >= 4.0
-Requires:	nspr >= 4.7.0
+Requires:	%{name}-libs = %{version}-%{release}
+%if %{with default_js}
 Provides:	js = 2:1.8.5
 Obsoletes:	js < 2:1.8
+%endif
 BuildRoot:	%{tmpdir}/%{name}-%{version}-root-%(id -u -n)
 
 %description
@@ -41,35 +47,52 @@ dekompilator, odśmiecacz, standardowe klasy) i niewielką powłokę,
 która może być używana interaktywnie lub z plikami .js do uruchamiania
 skryptów.
 
+%package libs
+Summary:	SpiderMonkey JavaScript 1.8.5 library
+Summary(pl.UTF-8):	Biblioteka SpiderMonkey JavaScript 1.8.5
+Group:		Libraries
+Requires:	nspr >= 4.7.0
+Conflicts:	js185 < 1.0.0-4
+
+%description libs
+SpiderMonkey JavaScript 1.8.5 library.
+
+%description libs -l pl.UTF-8
+Biblioteka SpiderMonkey JavaScript 1.8.5.
+
 %package devel
-Summary:	Header files for JavaScript reference library
-Summary(pl.UTF-8):	Pliki nagłówkowe do biblioteki JavaScript
+Summary:	Header files for JavaScript 1.8.5 reference library
+Summary(pl.UTF-8):	Pliki nagłówkowe biblioteki JavaScript 1.8.5
 Group:		Development/Libraries
-Requires:	%{name} = %{version}-%{release}
+Requires:	%{name}-libs = %{version}-%{release}
 Requires:	libstdc++-devel
 Requires:	nspr-devel >= 4.7.0
+%if %{with default_js}
 Provides:	js-devel = 2:1.8.5
 Obsoletes:	js-devel < 2:1.8
+%endif
 
 %description devel
-Header files for JavaScript reference library.
+Header files for JavaScript 1.8.5 reference library.
 
 %description devel -l pl.UTF-8
-Pliki nagłówkowe do biblioteki JavaScript.
+Pliki nagłówkowe biblioteki JavaScript 1.8.5.
 
 %package static
-Summary:	Static JavaScript reference library
-Summary(pl.UTF-8):	Statyczna biblioteka JavaScript
+Summary:	Static JavaScript 1.8.5 reference library
+Summary(pl.UTF-8):	Statyczna biblioteka JavaScript 1.8.5
 Group:		Development/Libraries
 Requires:	%{name}-devel = %{version}-%{release}
+%if %{with default_js}
 Provides:	js-static = 2:1.8.5
 Obsoletes:	js-static < 2:1.8
+%endif
 
 %description static
-Static version of JavaScript reference library.
+Static version of JavaScript 1.8.5 reference library.
 
 %description static -l pl.UTF-8
-Statyczna wersja biblioteki JavaScript.
+Statyczna wersja biblioteki JavaScript 1.8.5.
 
 %prep
 %setup -q -n js-1.8.5
@@ -93,39 +116,71 @@ rm -rf $RPM_BUILD_ROOT
 
 %{__make} -C js/src install \
 	DESTDIR=$RPM_BUILD_ROOT \
-	MOZILLA_VERSION=%{version}
+	MOZILLA_VERSION=%{version} \
+	MODULE=%{name}
 
 # not installed by make install in new buildsystem
-install js/src/shell/js js/src/jscpucfg $RPM_BUILD_ROOT%{_bindir}
+install js/src/shell/js $RPM_BUILD_ROOT%{_bindir}/js185
+install js/src/jscpucfg $RPM_BUILD_ROOT%{_bindir}/js185cpucfg
 
-# provide libjs.so for backward compability at build time
+%{__mv} $RPM_BUILD_ROOT%{_bindir}/js-config $RPM_BUILD_ROOT%{_bindir}/js185-config
+
+%if %{with default_js}
+# provide symlinks as default js implementation
 # (don't provide libjs.so.1 as the libraries are not binary-compatible)
 ln -sf libmozjs185.so $RPM_BUILD_ROOT%{_libdir}/libjs.so
 ln -sf libmozjs185-1.0.a $RPM_BUILD_ROOT%{_libdir}/libjs.a
+ln -sf js185 $RPM_BUILD_ROOT%{_includedir}/js
+ln -sf js185 $RPM_BUILD_ROOT%{_bindir}/js
+ln -sf js185-config $RPM_BUILD_ROOT%{_bindir}/js-config
+ln -sf js185cpucfg $RPM_BUILD_ROOT%{_bindir}/jscpucfg
+%else
+%{__sed} -i -e 's,/js$,/js185,' $RPM_BUILD_ROOT%{_pkgconfigdir}/mozjs185.pc
+%endif
 
 %clean
 rm -rf $RPM_BUILD_ROOT
 
-%post	-p /sbin/ldconfig
-%postun	-p /sbin/ldconfig
+%post	libs -p /sbin/ldconfig
+%postun	libs -p /sbin/ldconfig
+
+%if %{with default_js}
+%pretrans devel
+if [ -d %{_includedir}/js ] && [ ! -L %{_includedir}/js ]; then
+	rm -rf /usr/include/js
+fi
+%endif
 
 %files
 %defattr(644,root,root,755)
 %doc js/src/README.html
+%attr(755,root,root) %{_bindir}/js185
+%if %{with default_js}
 %attr(755,root,root) %{_bindir}/js
+%endif
+
+%files libs
+%defattr(644,root,root,755)
 %attr(755,root,root) %{_libdir}/libmozjs185.so.*.*.*
 %attr(755,root,root) %ghost %{_libdir}/libmozjs185.so.1.0
 
 %files devel
 %defattr(644,root,root,755)
+%attr(755,root,root) %{_bindir}/js185-config
+%attr(755,root,root) %{_bindir}/js185cpucfg
+%attr(755,root,root) %{_libdir}/libmozjs185.so
+%{_includedir}/js185
+%{_pkgconfigdir}/mozjs185.pc
+%if %{with default_js}
 %attr(755,root,root) %{_bindir}/js-config
 %attr(755,root,root) %{_bindir}/jscpucfg
 %attr(755,root,root) %{_libdir}/libjs.so
-%attr(755,root,root) %{_libdir}/libmozjs185.so
 %{_includedir}/js
-%{_pkgconfigdir}/mozjs185.pc
+%endif
 
 %files static
 %defattr(644,root,root,755)
-%{_libdir}/libjs.a
 %{_libdir}/libmozjs185-1.0.a
+%if %{with default_js}
+%{_libdir}/libjs.a
+%endif
