@@ -17,6 +17,7 @@ Group:		Development/Languages
 Source0:	http://ftp.mozilla.org/pub/mozilla.org/js/%{name}-%{version}.tar.gz
 # Source0-md5:	a4574365938222adca0a6bd33329cb32
 Patch0:		%{name}-install.patch
+Patch1:		%{name}-c++.patch
 URL:		http://www.mozilla.org/js/
 BuildRequires:	libstdc++-devel
 BuildRequires:	nspr-devel >= 4.7.0
@@ -97,6 +98,7 @@ Statyczna wersja biblioteki JavaScript 1.8.5.
 %prep
 %setup -q -n js-1.8.5
 %patch0 -p1
+%patch1 -p1
 
 sed -i -e 's/-O3//' js/src/Makefile.in js/src/config/Makefile.in
 
