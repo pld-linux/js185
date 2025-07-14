@@ -97,8 +97,8 @@ Statyczna wersja biblioteki JavaScript 1.8.5.
 
 %prep
 %setup -q -n js-1.8.5
-%patch0 -p1
-%patch1 -p1
+%patch -P0 -p1
+%patch -P1 -p1
 
 sed -i -e 's/-O3//' js/src/Makefile.in js/src/config/Makefile.in
 
