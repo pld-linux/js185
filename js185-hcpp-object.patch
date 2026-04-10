@@ -1,0 +1,12 @@
+--- js-1.8.5/js/src/build/hcpp.orig2	2026-04-10 23:04:41.006425232 +0200
++++ js-1.8.5/js/src/build/hcpp	2026-04-10 23:05:10.006276003 +0200
+@@ -67,7 +67,9 @@
+ 			;;
+ 		*.o)	if [ $i = `basename $i` ]
+ 			then
++				OBJECT="$i"
+ 				i=""
++				DASH_O=1
+ 			else
+ 				OPTS="${OPTS} -o"
+    				DASH_O=1
