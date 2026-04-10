@@ -11,7 +11,7 @@ Summary:	SpiderMonkey JavaScript 1.8.5 implementation
 Summary(pl.UTF-8):	Implementacja SpiderMonkey języka JavaScript 1.8.5
 Name:		js185
 Version:	1.0.0
-Release:	8
+Release:	9
 License:	MPL 1.1 or GPL v2+ or LGPL v2.1+
 Group:		Development/Languages
 Source0:	http://ftp.mozilla.org/pub/mozilla.org/js/%{name}-%{version}.tar.gz
@@ -20,6 +20,7 @@ Patch0:		%{name}-install.patch
 Patch1:		%{name}-c++.patch
 Patch2:		%{name}-configure-implicit-int.patch
 Patch3:		%{name}-hcpp-object.patch
+Patch4:		%{name}-x32.patch
 URL:		http://www.mozilla.org/js/
 BuildRequires:	libstdc++-devel
 BuildRequires:	nspr-devel >= 4.7.0
