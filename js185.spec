@@ -104,6 +104,7 @@ Statyczna wersja biblioteki JavaScript 1.8.5.
 %patch -P1 -p1
 %patch -P2 -p1
 %patch -P3 -p1
+%patch -P4 -p1
 
 sed -i -e 's/-O3//' js/src/Makefile.in js/src/config/Makefile.in
 
