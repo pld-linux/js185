@@ -115,7 +115,10 @@ cd js/src
 %configure2_13 \
 	--enable-readline \
 	--enable-threadsafe \
+%ifarch x32
 	--disable-methodjit \
+	--disable-tracejit \
+%endif
 	--with-system-nspr
 
 %{__make} \
